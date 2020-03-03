@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1582094170 source:c:\users\j_l698\documents\course\cs3358\assignment2\assignment2\3358_2_lastname_firstname_pg2.cpp
+	<iostream>
+	<iomanip>
+	<cstring>
+	<vector>
+	<ctime>
+	<stdlib.h>
+	<time.h>
+
