@@ -8,7 +8,9 @@
 //
 //	 Instructor: Husain	Gholoom.
 //
-// 	<Brief	description	of	the		purpose	of	the	program>
+// 	 This assignment is using stack and queue ADT to determine
+//   if a string entered by a user (separator included) is either
+//   the same or the reverse of the first stack/queue
 
 #include <iostream>
 #include <string>
@@ -37,6 +39,8 @@ public:
 
         delete tempNode;
     }
+
+
 
     void push(char lett){
         Node *n = new Node();
@@ -83,27 +87,97 @@ class LinkedQueue{
         char data;
         Qnode* next;
         Qnode(char lett){
-            data = lett;
+            this->data = lett;
             next = NULL;
             }
-    };
+    }*p=NULL;
 
 public:
-    LinkedQueue(){
+    Qnode *front, *rear;
+    LinkedQueue(){front=rear=NULL; queueSize=0;}
+    ~LinkedQueue(){
+    Qnode* tempNode;
+        while(front){
+            tempNode = front;
+            delete front;
+            front = tempNode->next;
+        }
+
+        delete tempNode;
+        queueSize=0;}
+
+    void enqueue(char lett){
+        queueSize++;
+        Qnode *temp=new Qnode(lett);
+        if(temp==NULL){
+            cout<<"Overflow"<<endl;
+            return;
+        }
+        temp->data=lett;
+        temp->next=NULL;
+
+        //for first node
+        if(front==NULL){
+            front=rear=temp;
+        }
+        else{
+            rear->next=temp;
+            rear=temp;
+        }
 
     }
+
+    char dequeue(){
+        char temp;
+        if(front == NULL){
+            return 0;
+        }
+        else{
+            p = front;
+            temp = p->data;
+            front = front->next;
+            delete(p);
+            return(temp);
+        }
+
+    }
+    void rev(){
+
+        Qnode* curr = front;
+        Qnode *p = NULL, *next = NULL;
+        while( curr != NULL){
+            next = curr->next;
+            curr->next = p;
+            p = curr;
+            curr = next;
+        }
+        front = p;
+    }
+
+    int getSize(){
+        return queueSize;
+    }
+    void resetSize(){
+    queueSize=0;}
+private:
+    int queueSize;
+    int numItems;
 };
 
 void details();
 void menu();
 void exit();
 void createStack(LinkedStack &, LinkedStack &);
+void createQueue(LinkedQueue &, LinkedQueue &);
 
 int main()
 {
-    int choice;
+    int choice;     //choice from user
+    bool loop = true;       //loop determinate
     LinkedStack str1;
     LinkedStack str2;
+    LinkedQueue qStr1 ;
+    LinkedQueue qStr2 ;
 
     details();
     menu();
@@ -113,18 +187,27 @@ int main()
         switch(choice){
         case 1:
             createStack(str1 , str2 );
+            menu();
+            cin >> choice;
             break;
         case 2:
+            createQueue(qStr1, qStr2);
+            qStr1.resetSize();
+            qStr2.resetSize();
+            menu();
+            cin >> choice;
             break;
         case 9:
+            loop = false;
             exit();
             break;
         default:
             cout << "Invalid Option.\n\n";
             menu();
             cin >> choice;
+            break;
         }
-    }while(choice == 1 || choice == 2 || choice == 9);
+    }while(loop);
 
 
 
@@ -147,23 +230,23 @@ void menu(){
 }
 
 void exit(){
-    cout << "*** End of the program. ***/n"
-         << "*** Written by Jeremiah Lopez ***/n"
-         << "*** March 2nd 2020 ***/n/n";
+    cout << "*** End of the program. **\/n"
+         << "*** Written by Jeremiah Lopez ***\n"
+         << "*** March 2nd 2020 ***\n\n";
 }
 
-void createStack(LinkedStack & charStack1 , LinkedStack & charStack2 ){
-    string vals;
-    int location;
-    int larger;
-    char lett;
+void createStack(LinkedStack & charStack1 , LinkedStack & charStack2){
+    string vals;        //string from user
+    int location;       //index of separator
+    int larger;         //size of larger stack
+    char lett;          //char from string
+    bool checker;       //bool for in order check
 
     cout << "Enter Stack Values:\t";
     cin >> vals;
 
     for(int i =0; i < vals.size(); i++){
         if(vals.at(i) != '#'){
-            //cout << vals.at(i);
             lett = vals.at(i);
             charStack1.push(lett);
         }
@@ -176,7 +259,6 @@ void createStack(LinkedStack & charStack1 , LinkedStack & charStack2 ){
         if(i <= location)
             continue;
         else{
-            //cout << vals.at(i);
             lett = vals.at(i);
             charStack2.push(lett);
         }
@@ -191,13 +273,75 @@ void createStack(LinkedStack & charStack1 , LinkedStack & charStack2 ){
 
     for(int i=0; i<larger; i++){
         if(charStack1.pop() == charStack2.pop()){
-            cout << "Strings are identical.";
+            continue;
+        }
+        else{
+            checker = false;
             break;
         }
-        else
-            cout << "Strings are not Identical.";
-            break;
-
     }
 
+    if(checker == false){
+        cout << "Strings are not Identical.\n\n";
+    }
+    else{
+        cout << "Strings are identical.\n\n";
+    }
+
+}
+
+void createQueue(LinkedQueue & charQueue1, LinkedQueue & charQueue2){
+    string vals;        //string from user
+    int location;       //index of separator
+    int larger;         //the larger queue
+    char lett;          //letter from string
+    bool checker;       //bool for reverse check
+
+    cout<< "Enter Queue Values.\t";
+    cin>> vals;
+
+    for(int i =0; i < vals.size(); i++){
+        if(vals.at(i) != '#'){
+            lett = vals.at(i);
+            charQueue1.enqueue(lett);
+        }
+        else{
+            location= i;
+            break;
+
+        }
+    }
+    for(int i=0; i < vals.size(); i++){
+        if(i <= location){
+            continue;
+        }
+        else{
+            lett = vals.at(i);
+            charQueue2.enqueue(lett);
+        }
+    }
+
+    if(charQueue1.getSize() > charQueue2.getSize())
+        larger=charQueue1.getSize();
+    else if(charQueue1.getSize() < charQueue2.getSize())
+        larger=charQueue2.getSize();
+    else if(charQueue1.getSize() == charQueue2.getSize())
+        larger=charQueue1.getSize();
+
+    charQueue2.rev();
+
+    for(int i = 0; i < larger; i++){
+        if(charQueue1.dequeue() != charQueue2.dequeue()){
+            checker = false;
+            break;
+        }
+    }
+
+    if(checker==false){
+        cout << "Strings are not reversed.\n\n";
+    }
+    else{
+        cout << "Strings are reversed.\n\n";
+    }
+    checker = true;
 }
